@@ -38,10 +38,23 @@ jobs:
 
   deployment:
     runs-on: ubuntu-latest
-    environment: DEV
+    needs: [build] 
     steps:
         # ...deployment-specific steps
       - name: Run only if a PR is opened
         if: ${{ github.event_name == 'pull_request' }}
         run: echo Hello, from the PR!!!
+
+      - uses: actions/checkout@v4
+        with:
+          repository: im-sandbox-mikaelt/hello-public1-composite-action
+          path: ./.github/actions/hello-public1-composite-action
+          token: ${{ secrets.GH_PA_TOKEN }}
+
+      - id: foo
+        uses: ./.github/actions/hello-public1-composite-action
+        with:
+          who-to-greet: 'Mona the Octocat with Public App'
+      - run: echo "random number" ${{ steps.foo.outputs.random-number }}
+        shell: bash
 
